@@ -1,3 +1,4 @@
+#[path ="../camera_controller.rs"]
 mod camera_controller;
 
 use std::f32;
@@ -131,6 +132,7 @@ fn draw_forward_decal_gizmo(
         let scale = transform.scale();
         let size = vec2(scale.x, scale.z);
         gizmos.axes(transform.compute_transform(), 0.2);
+        
         let mut isometry = transform.to_isometry();
         isometry.rotation *= Quat::from_rotation_x(f32::consts::FRAC_PI_2);
         gizmos.rect(isometry, size, Color::Srgba(Srgba::BLUE));

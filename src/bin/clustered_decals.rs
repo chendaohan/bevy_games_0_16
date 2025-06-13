@@ -1,3 +1,4 @@
+#[path ="../camera_controller.rs"]
 mod camera_controller;
 
 use bevy::{pbr::decal::clustered::ClusteredDecal, prelude::*};
