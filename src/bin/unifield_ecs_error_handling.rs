@@ -5,6 +5,7 @@ use bevy::{
         error::{ErrorContext, GLOBAL_ERROR_HANDLER},
         query::QuerySingleError,
     },
+    log::LogPlugin,
     prelude::*,
 };
 
@@ -35,7 +36,10 @@ fn main() -> AppExit {
         .expect("只能设置一次");
 
     App::new()
-        .add_plugins(MinimalPlugins.set(ScheduleRunnerPlugin::run_once()))
+        .add_plugins((
+            MinimalPlugins.set(ScheduleRunnerPlugin::run_once()),
+            LogPlugin::default(),
+        ))
         .add_systems(Startup, setup)
         .add_systems(Update, unifield_error_handling)
         .add_systems(Update, separate_error_handling.pipe(separate_error_handler))
@@ -49,8 +53,9 @@ struct MyPlayer;
 fn setup(mut commands: Commands) {
     commands.queue(|world: &mut World| -> Result {
         world
-            .spawn((Name::new("MyPlayer"), MyPlayer))
-            .observe(observer_unifield_error_handling);
+            .spawn_empty()
+            .observe(observer_unifield_error_handling)
+            .insert((Name::new("MyPlayer"), MyPlayer));
 
         Ok(())
     });
@@ -66,7 +71,7 @@ fn unifield_error_handling(players: Query<&Name, With<MyPlayer>>) -> Result {
 
 // 观察者统一 ECS 错误处理
 fn observer_unifield_error_handling(
-    _trigger: Trigger<OnAdd>,
+    _trigger: Trigger<OnAdd, MyPlayer>,
     players: Query<&Name, With<MyPlayer>>,
 ) -> Result {
     let name = players.single()?;
